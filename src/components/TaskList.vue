@@ -1,21 +1,21 @@
 <template>
     <div class="comtainer">
         <div class="task-zone">
-            <div class="drop-zone">
+            <div class="drop-zone" @drop="onDrop($event, 'todo')" @dragenter.prevent @dragover.prevent>
                 <h1>To-Do</h1> 
-                <div class="drag-el" v-for="task in tasks" :key="task.id">
+                <div class="drag-el" draggable @dragstart="onStart($evnt,task)" v-for="task in tasks" :key="task.id" >
                     {{ task.title}}
                 </div>
             </div>
-             <div class="drop-zone" >
+            <div class="drop-zone" @drop="onDrop($event, 'going')" @dragenter.prevent @dragover.prevent>
                 <h1>Doing</h1>
-                <div class="drag-el" v-for="task in tasks" :key="task.id" > 
+                <div class="drag-el" draggable @dragstart="onStart($evnt,task)" v-for="task in tasks" :key="task.id" > 
                    {{ task.title}} 
                 </div>
-             </div>
-            <div class="drop-zone">
+            </div>
+            <div class="drop-zone" @drop="onDrop($event, 'done')" @dragenter.prevent @dragover.prevent>
                 <h1>Done</h1>
-                <div class="drag-el" v-for="task in tasks" :key="task.id" >
+                <div class="drag-el" draggable @dragstart="onStart($evnt,task)" v-for="task in tasks" :key="task.id" >
                     {{ task.title}} 
                 </div>
             </div>
@@ -43,6 +43,11 @@ export default{
                     id: 3,
                     title: 'Item C',
                     status: 'todo'
+                },
+                {
+                    id: 4,
+                    title: 'Item D',
+                    status: 'todo'
                 }
             ]
         }
@@ -56,6 +61,18 @@ export default{
         },
         doneList(){
             return this.tasks.filter(tasks => tasks.status =="done")
+        }
+    },
+    methods:{
+        onStart(e,task){
+            e.dataTransfer.dropEffect = "move"
+            e.dataTransfer.effectAllowed = "move"
+            e.dataTransfer.setData('taskId',task.id)
+        },
+        onDrop(e,newStatus){
+            const taskId = e.dataTransfer.getData('taskId')
+            const task = this.tasks.find(task =>task.id == taskId)
+            task.status = newStatus
         }
     }
 }
